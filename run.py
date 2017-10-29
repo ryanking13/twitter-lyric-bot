@@ -1,8 +1,11 @@
 import random
 import crawler
+import time
 from twitter_manager import post
+from apscheduler.schedulers.background import BackgroundScheduler
 
 USED_LIST = 'used_song_list.txt'
+TWEET_LENGTH_LIMIT = 140
 
 
 # check is song is already posted before
@@ -38,8 +41,7 @@ def select_song(track_list):
 
         # if it contains lyric data
         if song:
-            update_used_song_list(track)
-            return song
+            return song, track
 
 
 # get random verse from naver music
@@ -48,7 +50,7 @@ def get_random_verse(min_len=0, max_len=99999):
 
     while True:
 
-        song = select_song(track_list)
+        song, track_id = select_song(track_list)
         lyric = song['lyric']
         title = song['title']
         artist = song['artist']
@@ -72,6 +74,7 @@ def get_random_verse(min_len=0, max_len=99999):
             continue
 
         # verse found
+        update_used_song_list(track_id)
         break
 
     return song['title'], song['artist'], verse
@@ -87,14 +90,21 @@ def format_tweet(title, artist, verse):
     return tweet
 
 
+def run_bot():
+    title, artist, verse = get_random_verse(min_len=30, max_len=TWEET_LENGTH_LIMIT)
+    tweet = format_tweet(title, artist, verse)
+    post(tweet)
+
+
 def main():
 
-    tweet_length_limit = 140
+    sched = BackgroundScheduler()
+    sched.add_job(func=run_bot, trigger='cron', hour='8,15,22')
+    sched.start()
 
-    title, artist, verse = get_random_verse(min_len=30, max_len=tweet_length_limit)
-    tweet = format_tweet(title, artist, verse)
+    while True:
+        time.sleep(5)
 
-    post(tweet)
 
 if __name__ == '__main__':
     main()
