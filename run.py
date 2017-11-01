@@ -21,11 +21,17 @@ def is_song_duplicated(track_id):
 
 
 # update the used song list file
-def update_used_song_list(track_id):
+def update_used_song_list(track_id, max_list_size=50):
 
-    with open(USED_LIST, 'a') as f:
+    with open(USED_LIST, 'r') as f:
+        lines = f.readlines()
+
+    if len(lines) > max_list_size:
+        lines = lines[-max_list_size:]
+
+    with open(USED_LIST, 'w') as f:
+        f.writelines(lines)
         f.write(track_id + '\n')
-
 
 # return song that contains lyric data
 def select_song(track_list):
