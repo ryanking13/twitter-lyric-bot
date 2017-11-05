@@ -73,6 +73,17 @@ def is_lyric_native(lyric, ratio=0.2):
     return True
 
 
+# check words in lyric
+def is_lyric_pure(lyric):
+    
+    filter_list = ['(', ')']
+
+    for f in filter_list:
+        if f in lyric:
+            return False
+
+    return True
+
 # get song trackIDs
 def get_song_list(page_range=5):
     url = 'http://music.naver.com/listen/newTrack.nhn'

@@ -79,6 +79,10 @@ def get_random_verse(min_len=0, max_len=99999):
         if not crawler.is_lyric_native(verse, ratio=0.1):
             continue
 
+        # check spetial chracters in verse
+        if not crawler.is_lyric_pure(verse):
+            continue
+
         # verse found
         update_used_song_list(track_id)
         break
