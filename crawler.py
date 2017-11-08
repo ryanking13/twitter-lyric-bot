@@ -98,7 +98,13 @@ def get_song_list(page_range=5):
 
                 data = header.get('artistdata')
                 data = data.replace('\'', '\"')  # change to valid json format
-                data = json.loads(data)
+                
+                
+                try:
+                    data = json.loads(data)
+                # if not valid json, ignore it
+                except json.decoder.JSONDecodeError:
+                    break 
 
                 for d in data:
                     track_id = list(d.keys())[0]
