@@ -2,7 +2,7 @@
 
 랜덤하게 한국어 가사를 긁어와서 포스팅하는 트위터 봇
 
-https://twitter.com/acebroad
+https://twitter.com/dailylyricbot
 
 ## Development Environment
 
