@@ -4,14 +4,14 @@ import time
 from twitter_manager import post
 from apscheduler.schedulers.background import BackgroundScheduler
 
-USED_LIST = 'used_song_list.txt'
+USED_LIST = "used_song_list.txt"
 TWEET_LENGTH_LIMIT = 140
 
 
 # check is song is already posted before
 def is_song_duplicated(track_id):
 
-    with open(USED_LIST, 'r') as f:
+    with open(USED_LIST, "r") as f:
         used_songs = [l.strip() for l in f.readlines()]
 
         if track_id in used_songs:
@@ -23,15 +23,16 @@ def is_song_duplicated(track_id):
 # update the used song list file
 def update_used_song_list(track_id, max_list_size=50):
 
-    with open(USED_LIST, 'r') as f:
+    with open(USED_LIST, "r") as f:
         lines = f.readlines()
 
     if len(lines) > max_list_size:
         lines = lines[-max_list_size:]
 
-    with open(USED_LIST, 'w') as f:
+    with open(USED_LIST, "w") as f:
         f.writelines(lines)
-        f.write(track_id + '\n')
+        f.write(track_id + "\n")
+
 
 # return song that contains lyric data
 def select_song(track_list):
@@ -57,17 +58,18 @@ def get_random_verse(min_len=0, max_len=99999):
     while True:
 
         song, track_id = select_song(track_list)
-        lyric = song['lyric']
-        title = song['title']
-        artist = song['artist']
+        lyric = song["lyric"]
+        title = song["title"]
+        artist = song["artist"]
 
         # check english/korean ratio of the lyric
         if not crawler.is_lyric_native(lyric, ratio=0.2):
             continue
 
         # separate lyric to verses
-        verses = crawler.separate_verse(lyric, min_len=min_len,
-                                        max_len=max_len - len(title) - len(artist) - 10)
+        verses = crawler.separate_verse(
+            lyric, min_len=min_len, max_len=max_len - len(title) - len(artist) - 10
+        )
 
         # if no verse that pass filter
         if len(verses) == 0:
@@ -87,15 +89,15 @@ def get_random_verse(min_len=0, max_len=99999):
         update_used_song_list(track_id)
         break
 
-    return song['title'], song['artist'], verse
+    return song["title"], song["artist"], verse
 
 
 # format song data to tweet
 def format_tweet(title, artist, verse):
-    tweet = ''
+    tweet = ""
     tweet += verse
-    tweet += '\n\n'
-    tweet += artist + ' - ' + title
+    tweet += "\n\n"
+    tweet += artist + " - " + title
 
     return tweet
 
@@ -107,14 +109,8 @@ def run_bot():
 
 
 def main():
-
-    sched = BackgroundScheduler()
-    sched.add_job(func=run_bot, trigger='cron', hour='8,15,22')
-    sched.start()
-
-    while True:
-        time.sleep(5)
+    run_bot()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
