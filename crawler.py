@@ -1,6 +1,14 @@
-from request_manager import do_request
+import requests
 from bs4 import BeautifulSoup
 import json
+
+USER_AGENT = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+    "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36"
+)
+
+sess = requests.session()
+sess.headers.update({"User-Agent": USER_AGENT})
 
 
 # parse lyric and other data from naver music lyric page
@@ -42,8 +50,8 @@ def parse_data(page):
 def get_song(track_id):
     url = "http://music.naver.com/lyric/index.nhn"
 
-    page = do_request(url=url, params={"trackId": track_id})
-    data = parse_data(page)
+    r = sess.get(url=url, params={"trackId": track_id})
+    data = parse_data(r.text)
     return data
 
 
@@ -95,8 +103,8 @@ def get_song_list(page_range=5):
 
     track_ids = []
     for i in range(1, page_range + 1):
-        page = do_request(url=url, params={"page": str(i)})
-        soup = BeautifulSoup(page, "html.parser")
+        r = sess.get(url=url, params={"page": str(i)})
+        soup = BeautifulSoup(r.text, "html.parser")
 
         for header in soup.find_all("div"):
             if header.get("class") and header.get("class")[0] == "_tracklist_mytrack":

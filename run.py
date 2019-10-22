@@ -2,7 +2,6 @@ import random
 import crawler
 import time
 from twitter_manager import post
-from apscheduler.schedulers.background import BackgroundScheduler
 
 USED_LIST = "used_song_list.txt"
 TWEET_LENGTH_LIMIT = 140
@@ -56,7 +55,6 @@ def get_random_verse(min_len=0, max_len=99999):
     track_list = crawler.get_song_list()
 
     while True:
-
         song, track_id = select_song(track_list)
         lyric = song["lyric"]
         title = song["title"]
@@ -72,7 +70,7 @@ def get_random_verse(min_len=0, max_len=99999):
         )
 
         # if no verse that pass filter
-        if len(verses) == 0:
+        if not verses:
             continue
 
         verse = random.choice(verses)
@@ -81,7 +79,7 @@ def get_random_verse(min_len=0, max_len=99999):
         if not crawler.is_lyric_native(verse, ratio=0.1):
             continue
 
-        # check spetial chracters in verse
+        # check special chracters in verse
         if not crawler.is_lyric_pure(verse):
             continue
 
