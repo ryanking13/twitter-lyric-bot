@@ -1,7 +1,8 @@
 import random
-import crawler
+import music
 import time
-from twitter_manager import post
+import tweet
+import validation
 
 USED_LIST = "used_song_list.txt"
 TWEET_LENGTH_LIMIT = 140
@@ -43,7 +44,7 @@ def select_song(track_list):
         if is_song_duplicated(track):
             continue
 
-        song = crawler.get_song(track)
+        song = music.get_song(track)
 
         # if it contains lyric data
         if song:
@@ -52,7 +53,7 @@ def select_song(track_list):
 
 # get random verse from naver music
 def get_random_verse(min_len=0, max_len=99999):
-    track_list = crawler.get_song_list()
+    track_list = music.get_song_list()
 
     while True:
         song, track_id = select_song(track_list)
@@ -61,11 +62,11 @@ def get_random_verse(min_len=0, max_len=99999):
         artist = song["artist"]
 
         # check english/korean ratio of the lyric
-        if not crawler.is_lyric_native(lyric, ratio=0.2):
+        if not validation.is_lyric_native(lyric, ratio=0.2):
             continue
 
         # separate lyric to verses
-        verses = crawler.separate_verse(
+        verses = music.separate_verse(
             lyric, min_len=min_len, max_len=max_len - len(title) - len(artist) - 10
         )
 
@@ -76,11 +77,11 @@ def get_random_verse(min_len=0, max_len=99999):
         verse = random.choice(verses)
 
         # check english/korean ratio of the verse
-        if not crawler.is_lyric_native(verse, ratio=0.1):
+        if not validation.is_lyric_native(verse, ratio=0.1):
             continue
 
         # check special chracters in verse
-        if not crawler.is_lyric_pure(verse):
+        if not validation.is_lyric_pure(verse):
             continue
 
         # verse found
@@ -102,8 +103,8 @@ def format_tweet(title, artist, verse):
 
 def run_bot():
     title, artist, verse = get_random_verse(min_len=30, max_len=TWEET_LENGTH_LIMIT)
-    tweet = format_tweet(title, artist, verse)
-    post(tweet)
+    body = format_tweet(title, artist, verse)
+    tweet.post(body)
 
 
 def main():
