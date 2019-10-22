@@ -1,11 +1,11 @@
-from twitter_setting import *
+import config
 import twitter
 
 api = twitter.Api(
-    consumer_key=CONSUMER_KEY,
-    consumer_secret=CONSUMER_SECRET,
-    access_token_key=ACCESS_TOKEN_KEY,
-    access_token_secret=ACCESS_TOKEN_SECRET,
+    consumer_key=config.TWITTER_CONSUMER_KEY,
+    consumer_secret=config.TWITTER_CONSUMER_SECRET,
+    access_token_key=config.TWITTER_ACCESS_TOKEN_KEY,
+    access_token_secret=config.TWITTER_ACCESS_TOKEN_SECRET,
 )
 
 
