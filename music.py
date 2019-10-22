@@ -55,16 +55,6 @@ def get_song(track_id):
     return data
 
 
-# separate verses from lyric
-# if min_len is given, only verses longer than min_len is returned
-def separate_verse(lyric, min_len=0, max_len=99999):
-    splited = lyric.split("\n\n")
-
-    splited = [s for s in splited if min_len <= len(s) <= max_len]
-
-    return splited
-
-
 # get song trackIDs
 def get_song_list(page_range=5):
     url = "http://music.naver.com/listen/newTrack.nhn"

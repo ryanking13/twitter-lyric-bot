@@ -51,6 +51,16 @@ def select_song(track_list):
             return song, track
 
 
+# separate verses from lyric
+# if min_len is given, only verses longer than min_len is returned
+def separate_verse(lyric, min_len=0, max_len=99999):
+    splited = lyric.split("\n\n")
+
+    splited = [s for s in splited if min_len <= len(s) <= max_len]
+
+    return splited
+
+
 # get random verse from naver music
 def get_random_verse(min_len=0, max_len=99999):
     track_list = music.get_song_list()
@@ -66,7 +76,7 @@ def get_random_verse(min_len=0, max_len=99999):
             continue
 
         # separate lyric to verses
-        verses = music.separate_verse(
+        verses = separate_verse(
             lyric, min_len=min_len, max_len=max_len - len(title) - len(artist) - 10
         )
 
