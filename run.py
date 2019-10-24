@@ -107,8 +107,8 @@ def main():
         min_len=30, max_len=config.TWEET_LENGTH_LIMIT
     )
     body = format_tweet(title, artist, verse)
-    print(body)
-    # tweet.post(body)
+    # print(body)
+    tweet.post(body)
 
 
 if __name__ == "__main__":

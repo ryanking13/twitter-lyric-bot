@@ -68,7 +68,7 @@ def get_song_list(page_range=5):
             if header.get("class") and header.get("class")[0] == "_tracklist_mytrack":
 
                 data = header.get("artistdata")
-                data = data.replace("'", '"')  # change to valid json format
+                data = data.replace('\\"', '"')  # change to valid json format
 
                 try:
                     data = json.loads(data)
