@@ -82,7 +82,7 @@ def get_random_verse(min_len=0, max_len=99999):
         try:
             verse = select_verse(song, min_len, max_len)
         except Exception as e:
-            print(e)
+            # print(e)
             continue
 
         # verse found
