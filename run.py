@@ -36,13 +36,13 @@ def separate_verses(lyric, min_len=0, max_len=99999):
 
 
 # select a verse from a song
-def select_verse(song, min_len, max_len):
+def select_verse(lyric, title, artist, min_len, max_len):
 
     # separate lyric to verses
     verses = separate_verses(
-        song["lyric"],
+        lyric,
         min_len=min_len,
-        max_len=max_len - len(song["title"]) - len(song["artist"]) - 10,
+        max_len=max_len - len(title) - len(artist) - 10,
     )
 
     # if no verse that pass filter
@@ -52,7 +52,7 @@ def select_verse(song, min_len, max_len):
     verse = random.choice(verses)
 
     # check english/korean ratio of the lyric
-    if not validation.is_lyric_native(song["lyric"], ratio=0.2):
+    if not validation.is_lyric_native(lyric, ratio=0.2):
         raise ValueError
 
     # check english/korean ratio of the verse
@@ -68,29 +68,27 @@ def select_verse(song, min_len, max_len):
 
 # get random verse from naver music
 def get_random_verse(min_len=0, max_len=99999):
-    track_list = music.get_song_list()
+    track_infos = music.get_song_list()
 
     while True:
-        track_id = random.choice(track_list)
+        track = random.choice(track_infos)
 
         # if this song had been already used
-        if duplicated(track_id):
+        if duplicated(track["track_id"]):
             continue
 
-        # return song that contains lyric/title/artist data
-        song = music.get_song(track_id)
+        lyric = music.get_lyric(track["track_id"])
         try:
-            verse = select_verse(song, min_len, max_len)
+            verse = select_verse(lyric, track["title"], track["artist"], min_len, max_len)
         except Exception as e:
             # print(e)
             continue
 
         # verse found
-        if not config.DEBUG:
-            update_used_song_list(track_id)
+        update_used_song_list(track["track_id"])
         break
 
-    return song["title"], song["artist"], verse
+    return track["title"], track["artist"], verse
 
 
 # format song data for tweet

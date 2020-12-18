@@ -11,75 +11,111 @@ sess = requests.session()
 sess.headers.update({"User-Agent": USER_AGENT})
 
 
+def get_song_list():
+    url = "https://apis.naver.com/vibeWeb/musicapiweb/vibe/v1/chart/track/domestic"
+    r = sess.get(url=url, headers={"accept": "application/json"})
+
+    # with open("dump.json", "w", encoding="utf-8") as f:
+    #     f.write(json.dumps(r.json(), indent=2, ensure_ascii=False))
+
+    tracks = r.json()["response"]["result"]["chart"]["items"]["tracks"]
+
+    track_infos = []
+    for track in tracks:
+        track_id = track["trackId"]
+        title = track["trackTitle"]
+        artists = track["artists"]
+        artist_names = ", ".join(a["artistName"] for a in artists)
+        track_infos.append(
+            {
+                "track_id": track_id,
+                "title": title,
+                "artist": artist_names,
+            }
+        )
+
+    return track_infos
+
+
+def get_lyric(track_id):
+    url = "https://apis.naver.com/vibeWeb/musicapiweb/track/{}/info".format(track_id)
+    r = sess.get(url=url, headers={"accept": "application/json"})
+
+    track_info = r.json()["response"]["result"]["trackInformation"]
+    lyric = track_info.get("lyric", "")
+    return lyric
+
+
+# ----------- Deprecated (20/12/18): Naver music --> VIBE ------------
 # parse lyric and other data from naver music lyric page
-def parse_data(page):
-    soup = BeautifulSoup(page, "html.parser")
-    data = {}
+# def parse_data(page):
+#     soup = BeautifulSoup(page, "html.parser")
+#     data = {}
 
-    # parse lyric
-    lyric_section = soup.find("div", id="lyricText")
-    lyric = []
+#     # parse lyric
+#     lyric_section = soup.find("div", id="lyricText")
+#     lyric = []
 
-    if not lyric_section:
-        return None
+#     if not lyric_section:
+#         return None
 
-    for l in lyric_section:
+#     for l in lyric_section:
 
-        if str(l) == "<br/>":
-            lyric.append("\n")
-        else:
-            lyric.append(l)
+#         if str(l) == "<br/>":
+#             lyric.append("\n")
+#         else:
+#             lyric.append(l)
 
-    data["lyric"] = "".join(lyric)
+#     data["lyric"] = "".join(lyric)
 
-    # parse title, artist
-    for header in soup.find_all("span"):
-        header_class = header.get("class")[0]
+#     # parse title, artist
+#     for header in soup.find_all("span"):
+#         header_class = header.get("class")[0]
 
-        # title info
-        if header_class == "ico_play":
-            data["title"] = header.find("a").get("title")
-        # artist info
-        if header_class == "artist":
-            data["artist"] = header.find("a").get("title")
+#         # title info
+#         if header_class == "ico_play":
+#             data["title"] = header.find("a").get("title")
+#         # artist info
+#         if header_class == "artist":
+#             data["artist"] = header.find("a").get("title")
 
-    return data
+#     return data
+#
+# # get song using naver music trackID
+# def get_song(track_id):
+#     url = "http://music.naver.com/lyric/index.nhn"
 
+#     r = sess.get(url=url, params={"trackId": track_id})
+#     data = parse_data(r.text)
+#     return data
+#
+#
+# # get song trackIDs
+# def get_song_list(page_range=5):
+#     url = "http://music.naver.com/listen/newTrack.nhn"
 
-# get song using naver music trackID
-def get_song(track_id):
-    url = "http://music.naver.com/lyric/index.nhn"
+#     track_ids = []
+#     for i in range(1, page_range + 1):
+#         r = sess.get(url=url, params={"page": str(i)})
+#         soup = BeautifulSoup(r.text, "html.parser")
 
-    r = sess.get(url=url, params={"trackId": track_id})
-    data = parse_data(r.text)
-    return data
+#         for header in soup.find_all("div"):
+#             if header.get("class") and header.get("class")[0] == "_tracklist_mytrack":
 
+#                 data = header.get("artistdata")
+#                 data = data.replace('\\"', '"')  # change to valid json format
 
-# get song trackIDs
-def get_song_list(page_range=5):
-    url = "http://music.naver.com/listen/newTrack.nhn"
+#                 try:
+#                     data = json.loads(data)
+#                 # if not valid json, ignore it
+#                 except json.decoder.JSONDecodeError:
+#                     break
 
-    track_ids = []
-    for i in range(1, page_range + 1):
-        r = sess.get(url=url, params={"page": str(i)})
-        soup = BeautifulSoup(r.text, "html.parser")
+#                 for d in data:
+#                     track_id = list(d.keys())[0]
+#                     track_ids.append(track_id)
 
-        for header in soup.find_all("div"):
-            if header.get("class") and header.get("class")[0] == "_tracklist_mytrack":
+#                 break
 
-                data = header.get("artistdata")
-                data = data.replace('\\"', '"')  # change to valid json format
-
-                try:
-                    data = json.loads(data)
-                # if not valid json, ignore it
-                except json.decoder.JSONDecodeError:
-                    break
-
-                for d in data:
-                    track_id = list(d.keys())[0]
-                    track_ids.append(track_id)
-
-                break
-
-    return track_ids
+#     return track_ids
+# ----------------------------------------------------------
