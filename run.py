@@ -86,7 +86,8 @@ def get_random_verse(min_len=0, max_len=99999):
             continue
 
         # verse found
-        update_used_song_list(track_id)
+        if not config.DEBUG:
+            update_used_song_list(track_id)
         break
 
     return song["title"], song["artist"], verse
@@ -107,8 +108,11 @@ def main():
         min_len=30, max_len=config.TWEET_LENGTH_LIMIT
     )
     body = format_tweet(title, artist, verse)
-    # print(body)
-    tweet.post(body)
+
+    if config.DEBUG:
+        print(body)
+    else:
+        tweet.post(body)
 
 
 if __name__ == "__main__":
