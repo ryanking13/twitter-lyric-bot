@@ -10,4 +10,4 @@ GITHUB_REPO_URL = "ryanking13/twitter-lyric-bot"
 GITHUB_ISSUE_ID = 1
 TWEET_LENGTH_LIMIT = 140
 
-DEBUG = bool(os.environ.get("LYRIC_BOT_DEBUG") or "False")
+DEBUG = bool(os.environ.get("LYRIC_BOT_DEBUG") or "")
